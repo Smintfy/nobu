@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "./nobu.h"
+#include "nobu.h"
 
 int main(int argc, char **argv)
 {
@@ -15,7 +15,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    printf("Hello!\n");
+    printf("Hello, World!\n");
 
     return 0;
 }

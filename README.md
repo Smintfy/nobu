@@ -1,5 +1,5 @@
 # nobu
-Yet another *__NOT__* a build system for C.
+Yet another *__NOT__* a build system for C. Windows are currently not supported.
 
 ## Example
 ```C

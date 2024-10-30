@@ -1,20 +1,20 @@
 #ifndef NOBU_H_
 #define NOBU_H_
 
-#include <stdio.h>
+#include <errno.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <unistd.h>
 
-#define CMD_INIT(...)                                               \
-    do {                                                            \
-        Cmd_Array cmds = _cmd_array_make(__VA_ARGS__, NULL);        \
-        cmd_exec(&cmds);                                            \
-        _cmd_array_free(&cmds);                                     \
-    } while (0)                                                     \
+#define CMD_INIT(...)                                           \
+    do {                                                        \
+        Cmd_Array cmds = _cmd_array_make(__VA_ARGS__, NULL);    \
+        cmd_exec(&cmds);                                        \
+        _cmd_array_free(&cmds);                                 \
+    } while (0)                                                 \
 
 typedef struct {
     const char **cmds;
@@ -37,7 +37,7 @@ Cmd_Array _cmd_array_make(const char *cmd, ...)
         res.count++;
     va_end(args);
 
-    res.cmds = (const char **)malloc((res.count + 1) * sizeof(res.cmds[0])); // ALlocate except for the null terminator
+    res.cmds = (const char **)malloc((res.count + 1) * sizeof(res.cmds[0]));
     if (res.cmds == NULL) {
         fprintf(stderr, "[ERROR]: failed to allocate memory: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
@@ -65,7 +65,7 @@ void _cmd_array_free(Cmd_Array *cmd_arr)
 
 int cmd_exec(Cmd_Array *cmd_arr);
 int _is_source_modified(const char *source_path, const char *binary_path);
-int get_time(const char *pathname);
+int _get_time(const char *pathname);
 
 int cmd_exec(Cmd_Array *cmd_arr)
 {
@@ -92,7 +92,7 @@ int cmd_exec(Cmd_Array *cmd_arr)
     }
 }
 
-int get_time(const char *pathname)
+int _get_time(const char *pathname)
 {
     struct stat statbuf = {0};
 
@@ -108,8 +108,8 @@ int _is_source_modified(const char *source_path, const char *binary_path)
 {
     struct stat statbuf = {0};
 
-    int source_time = get_time(source_path);
-    int binary_time = get_time(binary_path);
+    int source_time = _get_time(source_path);
+    int binary_time = _get_time(binary_path);
 
     return source_time > binary_time;
 }
