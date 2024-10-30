@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define CMD_INIT(...)                                               \
     do {                                                            \
@@ -20,7 +22,6 @@ typedef struct {
 } Cmd_Array;
 
 Cmd_Array _cmd_array_make(const char *cmd, ...);
-Cmd_Array _cmd_array_append(Cmd_Array *cmd_arr, const char *cmd);
 void _cmd_array_free(Cmd_Array *cmd_arr);
 
 Cmd_Array _cmd_array_make(const char *cmd, ...)
@@ -36,7 +37,7 @@ Cmd_Array _cmd_array_make(const char *cmd, ...)
         res.count++;
     va_end(args);
 
-    res.cmds = (const char **)malloc((res.count) * sizeof(res.cmds[0])); // ALlocate except for the null terminator
+    res.cmds = (const char **)malloc((res.count + 1) * sizeof(res.cmds[0])); // ALlocate except for the null terminator
     if (res.cmds == NULL) {
         perror("Failed to allocate memory");
         exit(EXIT_FAILURE);
@@ -53,17 +54,6 @@ Cmd_Array _cmd_array_make(const char *cmd, ...)
     return res;
 }
 
-Cmd_Array _cmd_array_append(Cmd_Array *cmd_arr, const char *cmd)
-{
-    Cmd_Array res = {
-        .count = cmd_arr->count + 1
-    };
-    res.cmds = (const char **)malloc(res.count * sizeof(res.cmds[0]));
-    memcpy(res.cmds, cmd_arr->cmds, cmd_arr->count * sizeof(res.cmds[0]));
-    res.cmds[cmd_arr->count] = strdup(cmd);
-    return res;
-}
-
 void _cmd_array_free(Cmd_Array *cmd_arr)
 {
     for (size_t i = 0; i < cmd_arr->count; i++)
@@ -74,7 +64,8 @@ void _cmd_array_free(Cmd_Array *cmd_arr)
 }
 
 int cmd_exec(Cmd_Array *cmd_arr);
-int _is_source_modified(char *source_path, char *binary_path);
+int _is_source_modified(const char *source_path, const char *binary_path);
+int get_time(const char *pathname);
 
 int cmd_exec(Cmd_Array *cmd_arr)
 {
@@ -87,25 +78,40 @@ int cmd_exec(Cmd_Array *cmd_arr)
     }
 
     if (pid == 0) {
-        Cmd_Array args = _cmd_array_append(cmd_arr, NULL);
-
-        // printf("Executing command: %s\n", args.cmds[0]);
-        // for (size_t i = 0; i < args.count; i++)
-        //     printf("Arg[%zu]: %s\n", i, args.cmds[i]);
-
-        execvp(args.cmds[0], (char * const *)args.cmds); // This also execute the null terminator due to appending null from args
+        execvp(cmd_arr->cmds[0], (char * const *)cmd_arr->cmds); // This also execute the null terminator due to appending null from args
         perror("execvp failed");
         exit(EXIT_FAILURE);
     }  else {
         int status;
         waitpid(pid, &status, 0);
-        return WEXITSTATUS(status);
+        if (WIFEXITED(status))
+            return WEXITSTATUS(status);
+        else
+            return -1;
+
     }
 }
 
-// int _is_source_modified(char *source_path, char *binary_path)
-// {
-//     struct stat statbuf
-// }
+int get_time(const char *pathname)
+{
+    struct stat statbuf = {0};
+
+    if (stat(pathname, &statbuf) < 0) {
+        fprintf(stderr, "ERROR: could not stat %s: %s\n", pathname, strerror(errno));
+        exit(1);
+    }
+
+    return statbuf.st_mtimespec.tv_sec;
+}
+
+int _is_source_modified(const char *source_path, const char *binary_path)
+{
+    struct stat statbuf = {0};
+
+    int source_time = get_time(source_path);
+    int binary_time = get_time(binary_path);
+
+    return source_time > binary_time;
+}
 
 #endif // NOBU_H_
