@@ -39,7 +39,7 @@ Cmd_Array _cmd_array_make(const char *cmd, ...)
 
     res.cmds = (const char **)malloc((res.count + 1) * sizeof(res.cmds[0])); // ALlocate except for the null terminator
     if (res.cmds == NULL) {
-        perror("Failed to allocate memory");
+        fprintf(stderr, "[ERROR]: failed to allocate memory: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -71,24 +71,24 @@ int cmd_exec(Cmd_Array *cmd_arr)
 {
     pid_t pid = fork();
 
-    // TODO: better error
     if (pid < 0) {
-        perror("Failed to fork\n");
+        fprintf(stderr, "[ERROR]: could not fork child process: %s\n", strerror(errno));
         return -1;
     }
 
     if (pid == 0) {
         execvp(cmd_arr->cmds[0], (char * const *)cmd_arr->cmds); // This also execute the null terminator due to appending null from args
-        perror("execvp failed");
+        fprintf(stderr, "[ERROR]: could not execute child process: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }  else {
-        int status;
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status))
-            return WEXITSTATUS(status);
+        int wstatus = 0;
+        if (waitpid(pid, &wstatus, 0) < 0)
+            fprintf(stderr, "[ERROR]: waitpid failed for process %d: %s\n", pid, strerror(errno));
+
+        if (WIFEXITED(wstatus))
+            return WEXITSTATUS(wstatus);
         else
             return -1;
-
     }
 }
 

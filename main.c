@@ -1,11 +1,5 @@
 #include <assert.h>
-#include <errno.h>
 #include <stdio.h>
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #include "./nobu.h"
 
@@ -21,7 +15,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    printf("Hello, World!\n");
+    printf("Hello!\n");
 
     return 0;
 }
