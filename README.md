@@ -6,7 +6,7 @@ Yet another *__NOT__* a build system for C. Windows are currently not supported.
 #include <assert.h>
 #include <stdio.h>
 
-#include "./nobu.h"
+#include "nobu.h"
 
 int main(int argc, char **argv)
 {

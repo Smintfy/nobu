@@ -1,6 +1,3 @@
-#include <assert.h>
-#include <stdio.h>
-
 #include "../../nobu.h"
 
 /* compiler flags */
@@ -21,7 +18,7 @@ void rebuild_project()
 int main(int argc, char **argv)
 {
     AUTO_REBUILD_SELF(argc, argv); /* rebuild self (nobu.c) only when updated */
-    rebuild_project(); /* rebuild every single time ./nobu is executed */
+    rebuild_project(); /* rebuild and run main every single time ./nobu is executed */
 
     return 0;
 }
