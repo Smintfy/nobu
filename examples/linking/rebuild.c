@@ -3,8 +3,10 @@
 
 #include "../../nobu.h"
 
-#define C_FLAGS "-Wall", "-Wextra" /* compiler flags */
-#define LIBS "add.c", "subtract.c" /* link files or modules */
+/* compiler flags */
+#define C_FLAGS "-Wall", "-Wextra"
+/* link files or modules */
+#define LIBS "add.c", "subtract.c"
 void rebuild_project()
 {
     const char *source_path = "main.c";
@@ -18,8 +20,8 @@ void rebuild_project()
 
 int main(int argc, char **argv)
 {
-    AUTO_REBUILD_SELF(argc, argv); // Rebuild self (nobu.c) only when updated
-    rebuild_project(); // Rebuild every single time ./nobu is executed
+    AUTO_REBUILD_SELF(argc, argv); /* rebuild self (nobu.c) only when updated */
+    rebuild_project(); /* rebuild every single time ./nobu is executed */
 
     return 0;
 }
