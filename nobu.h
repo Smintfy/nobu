@@ -22,6 +22,7 @@ enum Log_Type {
 void _fmt_print_log(enum Log_Type type, char *message);
 char *_fmt_str(const char *fmt, ...);
 
+/* logger */
 #define LOG(type, message, spec) _fmt_print_log(type, _fmt_str(message, spec))
 
 /* concatenate strings */
@@ -35,7 +36,7 @@ char *_fmt_str(const char *fmt, ...);
         _cmd_array_free(&cmds);                                 \
     } while (0)                                                 \
 
-/* macro for rebuilding a program only when the source updated  */
+/* macro for rebuilding a program only when the source updated */
 #define AUTO_REBUILD_SELF(argc, argv)                           \
     do {                                                        \
         const char *source_path = __FILE__;                     \
@@ -43,7 +44,7 @@ char *_fmt_str(const char *fmt, ...);
         const char *binary_path = argv[0];                      \
         if (_is_source_modified(source_path, binary_path)) {    \
             LOG(NOBU_INFO, "rebuilding %s\n", source_path);     \
-            CMD_INIT("cc", "-o", binary_path, source_path);     \
+            CMD_INIT(CC, "-o", binary_path, source_path);     \
             CMD_INIT(binary_path);                              \
             exit(0);                                            \
         } else {                                                \
@@ -52,8 +53,8 @@ char *_fmt_str(const char *fmt, ...);
     } while (0)
 
 typedef struct {
-    const char **cmds;
-    size_t count;
+    const char  **cmds;
+    size_t      count;
 } Cmd_Array;
 
 Cmd_Array _cmd_array_init(const char *cmd, ...);
@@ -102,7 +103,6 @@ int cmd_exec(Cmd_Array *cmd_arr);
 char *_strconcat(const char *str, ...);
 int _is_source_modified(const char *source_path, const char *binary_path);
 int _get_time(const char *pathname);
-void _fmt_print_log(enum Log_Type type, char *message);
 
 int cmd_exec(Cmd_Array *cmd_arr)
 {
