@@ -9,8 +9,8 @@ void rebuild_project()
     const char *source_path = "main.c";
     const char *binary_path = "./main";
 
-    printf("[INFO] Rebuilding %s\n", source_path);
-    CMD_INIT("cc", C_FLAGS, "-o", binary_path, source_path, LIBS);
+    LOG(NOBU_INFO, "rebuilding %s\n", source_path);
+    CMD_INIT(CC, C_FLAGS, "-o", binary_path, source_path, LIBS);
     CMD_INIT(binary_path);
     exit(0);
 }

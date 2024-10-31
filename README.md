@@ -2,6 +2,7 @@
 Yet another *__NOT__* a build system for C. Windows are currently not supported.
 
 ## Example
+For more examples see [examples](https://github.com/Smintfy/nobu/tree/main/examples/).
 ```C
 #include <assert.h>
 #include <stdio.h>
