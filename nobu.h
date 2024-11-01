@@ -17,6 +17,7 @@ enum Log_Type {
     NOBU_INFO,
     NOBU_ERROR,
     NOBU_SUCCESS,
+    NOBU_WARN
 };
 
 void _fmt_print_log(enum Log_Type type, char *message);
@@ -44,7 +45,7 @@ char *_fmt_str(const char *fmt, ...);
         const char *binary_path = argv[0];                      \
         if (_is_source_modified(source_path, binary_path)) {    \
             LOG(NOBU_INFO, "rebuilding %s\n", source_path);     \
-            CMD_INIT(CC, "-o", binary_path, source_path);     \
+            CMD_INIT(CC, "-o", binary_path, source_path);       \
             CMD_INIT(binary_path);                              \
             exit(0);                                            \
         } else {                                                \
@@ -144,8 +145,6 @@ int _get_time(const char *pathname)
 
 int _is_source_modified(const char *source_path, const char *binary_path)
 {
-    struct stat statbuf = {0};
-
     int source_time = _get_time(source_path);
     int binary_time = _get_time(binary_path);
 
@@ -210,6 +209,9 @@ void _fmt_print_log(enum Log_Type type, char *message)
             break;
         case NOBU_SUCCESS:
             fprintf(stderr, "[SUCCESS]: %s", message);
+            break;
+        case NOBU_WARN:
+            fprintf(stderr, "[WARNING]: %s", message);
             break;
         default:
             printf("Unknown Log_Type: %d", type);
